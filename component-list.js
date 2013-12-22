@@ -5,7 +5,7 @@ var throat = require('throat');
 var Q = require('q');
 var cachedResults;
 
-var REGISTRY_URL = 'https://bower.herokuapp.com/packages';
+var REGISTRY_URL = 'https://boiler-registry.herokuapp.com/packages';
 
 function createComponentData(name, data, keywords) {
 	var ret = {
@@ -63,7 +63,7 @@ function fetchComponents(fetchNew) {
 			if (!err && response.statusCode === 200) {
 				deferred.resolve(fetchNew === true ? getDiffFromExistingRepos(body) : body);
 			} else {
-				console.log('err bower registry', response.statusCode, err, body);
+				console.log('err boiler registry', response.statusCode, err, body);
 				deferred.reject(err);
 			}
 		});
@@ -110,7 +110,7 @@ function fetchComponents(fetchNew) {
 						deferred.resolve(createComponentData(el.name, body, keywords));
 					};
 
-					fetchKeywords(user, repo, 'bower.json', function (err, keywords) {
+					fetchKeywords(user, repo, 'boiler.json', function (err, keywords) {
 						if (err) {
 							fetchKeywords(user, repo, 'package.json', function (err, keywords) {
 								complete(keywords);
@@ -144,7 +144,7 @@ function fetchComponents(fetchNew) {
 			cachedResults = results;
 		}
 
-		console.log('Finished fetching data from Bower registry', '' + new Date());
+		console.log('Finished fetching data from Boiler registry', '' + new Date());
 		return Q.all(fetchNew === true ? cachedResults.concat(results) : results);
 	});
 }
