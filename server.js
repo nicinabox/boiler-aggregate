@@ -3,6 +3,7 @@ var crypto = require('crypto');
 var connect = require('connect');
 var Q = require('q');
 var fetchComponents = require('./component-list');
+var http = require('http');
 var registry;
 var entity;
 
@@ -11,6 +12,30 @@ var HTTP_PORT = process.env.PORT || 8011;
 var UPDATE_OLD_REPOS_INTERVAL_IN_DAYS =  7;
 //interval for fetching new repos
 var UPDATE_NEW_REPOS_INTERVAL_IN_MINUTES = 60;
+
+function startKeepAlive() {
+  setInterval(function() {
+    var options = {
+        host: 'boiler-plugins-list.herokuapp.com',
+        port: 80,
+        path: '/'
+    };
+    http.get(options, function(res) {
+      res.on('data', function(chunk) {
+        try {
+          // optional logging... disable after it's working
+          console.log("HEROKU RESPONSE: " + chunk);
+        } catch (err) {
+          console.log(err.message);
+        }
+      });
+    }).on('error', function(err) {
+     console.log("Error: " + err.message);
+    });
+  }, 20 * 60 * 1000); // load every 20 minutes
+}
+
+startKeepAlive();
 
 function createEntity(list) {
 	var obj = {json: JSON.stringify(list)};
