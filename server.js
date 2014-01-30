@@ -37,6 +37,20 @@ function startKeepAlive() {
 
 startKeepAlive();
 
+var enableCORS = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+  // intercept OPTIONS method
+  if ('OPTIONS' == req.method) {
+    res.send(200);
+  }
+  else {
+    next();
+  }
+};
+
 function createEntity(list) {
 	var obj = {json: JSON.stringify(list)};
 	var shasum = crypto.createHash('sha1');
@@ -97,6 +111,7 @@ function serveComponentList(request, response, next) {
 getComponentListEntity();
 
 connect()
+  .use(enableCORS)
 	.use(connect.errorHandler())
 	.use(connect.timeout(60000))
 	.use(connect.logger('dev'))
